@@ -1,0 +1,217 @@
+slip 16
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="UserForm.aspx.cs" Inherits="UserForm" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>User Info Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>Enter Your Information</h2>
+
+            <asp:Label ID="lblName" runat="server" Text="Name: " />
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+
+            <asp:Label ID="lblEmail" runat="server" Text="Email: " />
+            <asp:TextBox ID="txtEmail" runat="server" /><br /><br />
+
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+
+public partial class UserForm : System.Web.UI.Page
+{
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        // Save user info in session variables
+        Session["UserName"] = txtName.Text;
+        Session["UserEmail"] = txtEmail.Text;
+
+        // Redirect to the next page
+        Response.Redirect("DisplayInfo.aspx");
+    }
+}
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="DisplayInfo.aspx.cs" Inherits="DisplayInfo" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Display User Info</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>User Information</h2>
+
+            <asp:Label ID="lblName" runat="server" /><br /><br />
+            <asp:Label ID="lblEmail" runat="server" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class DisplayInfo : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (Session["UserName"] != null && Session["UserEmail"] != null)
+        {
+            lblName.Text = "Name: " + Session["UserName"].ToString();
+            lblEmail.Text = "Email: " + Session["UserEmail"].ToString();
+        }
+        else
+        {
+            lblName.Text = "No information found. Please fill the form first.";
+        }
+    }
+}
+
+
+Q2
+CREATE TABLE Products (
+    Product_ID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100),
+    Price DECIMAL(10,2),
+    Quantity INT
+);
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProductGrid.aspx.cs" Inherits="ProductGrid" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Product Grid</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>Product Details</h2>
+
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False"
+                DataKeyNames="Product_ID" 
+                OnRowEditing="GridView1_RowEditing"
+                OnRowUpdating="GridView1_RowUpdating"
+                OnRowCancelingEdit="GridView1_RowCancelingEdit"
+                OnRowDeleting="GridView1_RowDeleting"
+                CssClass="grid">
+                <Columns>
+                    <asp:BoundField DataField="Product_ID" HeaderText="ID" ReadOnly="True" />
+                    <asp:BoundField DataField="Name" HeaderText="Product Name" />
+                    <asp:BoundField DataField="Price" HeaderText="Price" />
+                    <asp:BoundField DataField="Quantity" HeaderText="Quantity" />
+                    
+                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public partial class ProductGrid : System.Web.UI.Page
+{
+    string connStr = ConfigurationManager.ConnectionStrings["MyConn"].ConnectionString;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+            LoadData();
+    }
+
+    private void LoadData()
+    {
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Products", con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+
+    protected void GridView1_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
+    {
+        GridView1.EditIndex = e.NewEditIndex;
+        LoadData();
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        LoadData();
+    }
+
+    protected void GridView1_RowUpdating(object sender, System.Web.UI.WebControls.GridViewUpdateEventArgs e)
+    {
+        int productId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+        string name = ((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[1].Controls[0]).Text;
+        decimal price = Convert.ToDecimal(((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[2].Controls[0]).Text);
+        int quantity = Convert.ToInt32(((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[3].Controls[0]).Text);
+
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            string query = "UPDATE Products SET Name=@Name, Price=@Price, Quantity=@Quantity WHERE Product_ID=@ID";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ID", productId);
+            cmd.Parameters.AddWithValue("@Name", name);
+            cmd.Parameters.AddWithValue("@Price", price);
+            cmd.Parameters.AddWithValue("@Quantity", quantity);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        GridView1.EditIndex = -1;
+        LoadData();
+    }
+
+    protected void GridView1_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+    {
+        int productId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            string query = "DELETE FROM Products WHERE Product_ID=@ID";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ID", productId);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        LoadData();
+    }
+}
+
+
+
+XML
+
+<configuration>
+  <connectionStrings>
+    <add name="MyConn" 
+         connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=YourDatabaseName;Integrated Security=True"
+         providerName="System.Data.SqlClient" />
+  </connectionStrings>
+</configuration>

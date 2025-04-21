@@ -1,0 +1,289 @@
+slip 3
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ListTransfer.aspx.cs" Inherits="ListTransfer" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>ListView Transfer Example</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="display:flex; justify-content:center; align-items:flex-start; gap:50px; padding:40px;">
+            <!-- Source ListView -->
+            <asp:ListView ID="lvSource" runat="server">
+                <LayoutTemplate>
+                    <table border="1">
+                        <tr><th>Select</th><th>Item</th></tr>
+                        <tr id="itemPlaceholder" runat="server"></tr>
+                    </table>
+                </LayoutTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td><asp:CheckBox ID="chkSelect" runat="server" /></td>
+                        <td><%# Eval("Text") %></td>
+                    </tr>
+                </ItemTemplate>
+            </asp:ListView>
+
+            <!-- Buttons -->
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <asp:Button ID="btnToRight" runat="server" Text=">>" OnClick="btnToRight_Click" />
+                <asp:Button ID="btnToLeft" runat="server" Text="<<" OnClick="btnToLeft_Click" />
+            </div>
+
+            <!-- Destination ListView -->
+            <asp:ListView ID="lvDestination" runat="server">
+                <LayoutTemplate>
+                    <table border="1">
+                        <tr><th>Select</th><th>Item</th></tr>
+                        <tr id="itemPlaceholder" runat="server"></tr>
+                    </table>
+                </LayoutTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td><asp:CheckBox ID="chkSelect" runat="server" /></td>
+                        <td><%# Eval("Text") %></td>
+                    </tr>
+                </ItemTemplate>
+            </asp:ListView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Web.UI.WebControls;
+
+public partial class ListTransfer : System.Web.UI.Page
+{
+    // Keep lists in ViewState to persist data between postbacks
+    private List<ListItem> SourceList
+    {
+        get => ViewState["SourceList"] as List<ListItem> ?? new List<ListItem>();
+        set => ViewState["SourceList"] = value;
+    }
+
+    private List<ListItem> DestinationList
+    {
+        get => ViewState["DestinationList"] as List<ListItem> ?? new List<ListItem>();
+        set => ViewState["DestinationList"] = value;
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            SourceList = new List<ListItem>
+            {
+                new ListItem("Apple", "1"),
+                new ListItem("Banana", "2"),
+                new ListItem("Orange", "3"),
+                new ListItem("Mango", "4")
+            };
+            DestinationList = new List<ListItem>();
+
+            BindListViews();
+        }
+    }
+
+    private void BindListViews()
+    {
+        lvSource.DataSource = SourceList;
+        lvSource.DataBind();
+
+        lvDestination.DataSource = DestinationList;
+        lvDestination.DataBind();
+    }
+
+    protected void btnToRight_Click(object sender, EventArgs e)
+    {
+        List<ListItem> selectedItems = new List<ListItem>();
+
+        foreach (ListViewItem item in lvSource.Items)
+        {
+            CheckBox chk = (CheckBox)item.FindControl("chkSelect");
+            if (chk != null && chk.Checked)
+            {
+                string text = ((Literal)item.Controls[3]).Text;
+                selectedItems.Add(SourceList[item.DataItemIndex]);
+            }
+        }
+
+        foreach (var li in selectedItems)
+        {
+            SourceList.Remove(li);
+            DestinationList.Add(li);
+        }
+
+        BindListViews();
+    }
+
+    protected void btnToLeft_Click(object sender, EventArgs e)
+    {
+        List<ListItem> selectedItems = new List<ListItem>();
+
+        foreach (ListViewItem item in lvDestination.Items)
+        {
+            CheckBox chk = (CheckBox)item.FindControl("chkSelect");
+            if (chk != null && chk.Checked)
+            {
+                selectedItems.Add(DestinationList[item.DataItemIndex]);
+            }
+        }
+
+        foreach (var li in selectedItems)
+        {
+            DestinationList.Remove(li);
+            SourceList.Add(li);
+        }
+
+        BindListViews();
+    }
+}
+Q2.
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="database_pratice.WebForm1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            EMP id :-<asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Name:-<asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Desgination:-<asp:TextBox ID="TextBox3" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Joining Date:-<asp:TextBox ID="TextBox4" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Mobile Number:-<asp:TextBox ID="TextBox5" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Gender:-<asp:TextBox ID="TextBox6" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="id" DataSourceID="SqlDataSource1">
+                <Columns>
+                    <asp:BoundField DataField="id" HeaderText="id" ReadOnly="True" SortExpression="id" />
+                    <asp:BoundField DataField="name" HeaderText="name" SortExpression="name" />
+                    <asp:BoundField DataField="desg" HeaderText="desg" SortExpression="desg" />
+                    <asp:BoundField DataField="joindate" HeaderText="joindate" SortExpression="joindate" />
+                    <asp:BoundField DataField="mobile" HeaderText="mobile" SortExpression="mobile" />
+                    <asp:BoundField DataField="gender" HeaderText="gender" SortExpression="gender" />
+                </Columns>
+            </asp:GridView>
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:ConnectionString %>" SelectCommand="SELECT * FROM [employer]"></asp:SqlDataSource>
+            <br />
+            <asp:Button ID="Button1" runat="server"  OnClick="Button1_Click" Text="Insert" />
+&nbsp;&nbsp;
+            <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="Delete" />
+&nbsp;&nbsp;
+            <asp:Button ID="Button3" runat="server" OnClick="Button3_Click" Text="Edit" />
+            <br />
+            <br />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace database_pratice
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        SqlConnection cn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Database1.mdf;Integrated Security=True;Connect Timeout=30");
+        DataSet ds = new DataSet();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            SqlDataAdapter da = new SqlDataAdapter("select * from employer", cn);
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query1 = "INSERT INTO employer VALUES('"+TextBox1.Text+ "','" + TextBox2.Text + "','" + TextBox3.Text + "','" + TextBox4.Text + "','" + TextBox5.Text + "','" + TextBox6.Text + "')";
+            SqlCommand cmd = new SqlCommand(query1, cn);
+            cmd.ExecuteNonQuery();
+            GridView1.DataBind();
+            cn.Close();
+            TextBox1.Text = "";
+            TextBox2.Text = "";
+            TextBox3.Text = "";
+            TextBox4.Text = "";
+            TextBox5.Text = "";
+            TextBox6.Text = "";
+            Response.Write("<script>alert('Inserted Successfully');</script>");
+
+        }
+
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query2 = "delete from employer where id= " + TextBox1.Text;
+            SqlCommand cmd = new SqlCommand(query2, cn);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                GridView1.DataBind();
+                TextBox1.Text = "";
+                TextBox2.Text = "";
+                TextBox3.Text = "";
+                TextBox4.Text = "";
+                TextBox5.Text = "";
+                TextBox6.Text = "";
+                Response.Write("<script>alert('Deleted Successfully');</script>");
+            }catch(Exception x)
+            {
+                Response.Write("<script>alert('Not deleted ');</script>" + x);
+            }finally
+            {
+                cn.Close();
+            }
+        }
+
+        protected void Button3_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query3 = "update employer set name='" + TextBox2.Text + "',desg= '" + TextBox3.Text + "',joindate='" + TextBox4.Text + "',mobile= '" + TextBox5.Text + "',gender= '" + TextBox6.Text + "' where id= " + TextBox1.Text;
+            SqlCommand cmd = new SqlCommand(query3, cn);
+            cmd.ExecuteNonQuery();
+            GridView1.DataBind();
+            Response.Write("<script>alert('Updated Successfully');</script>");
+        }
+    }
+}
+
+
+CREATE TABLE [dbo].[employer] (
+    [id]       INT        NOT NULL,
+    [name]     NCHAR (10) NULL,
+    [desg]     NCHAR (10) NULL,
+    [joindate] NCHAR (10) NULL,
+    [mobile]   INT        NULL,
+    [gender]   NCHAR (10) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+
+ 	 	

@@ -1,0 +1,226 @@
+slip 19
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="UserForm.aspx.cs" Inherits="UserForm" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>User Info Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>Enter Your Information</h2>
+
+            <asp:Label ID="lblName" runat="server" Text="Name: " />
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+
+            <asp:Label ID="lblEmail" runat="server" Text="Email: " />
+            <asp:TextBox ID="txtEmail" runat="server" /><br /><br />
+
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+
+public partial class UserForm : System.Web.UI.Page
+{
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        // Save user info in session variables
+        Session["UserName"] = txtName.Text;
+        Session["UserEmail"] = txtEmail.Text;
+
+        // Redirect to the next page
+        Response.Redirect("DisplayInfo.aspx");
+    }
+}
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="DisplayInfo.aspx.cs" Inherits="DisplayInfo" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Display User Info</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>User Information</h2>
+
+            <asp:Label ID="lblName" runat="server" /><br /><br />
+            <asp:Label ID="lblEmail" runat="server" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class DisplayInfo : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (Session["UserName"] != null && Session["UserEmail"] != null)
+        {
+            lblName.Text = "Name: " + Session["UserName"].ToString();
+            lblEmail.Text = "Email: " + Session["UserEmail"].ToString();
+        }
+        else
+        {
+            lblName.Text = "No information found. Please fill the form first.";
+        }
+    }
+}
+
+
+Q2
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Quiz.aspx.cs" Inherits="Quiz" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Quiz Application</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Student Quiz</h2>
+
+            Name:
+            <asp:TextBox ID="txtName" runat="server" />
+            <asp:RequiredFieldValidator ID="rfvName" runat="server" ControlToValidate="txtName" ErrorMessage="* Name required" ForeColor="Red" /><br /><br />
+
+            <!-- Questions -->
+            <asp:Panel ID="pnlQuiz" runat="server">
+
+                <asp:Label runat="server" Text="1. What is the capital of France?" /><br />
+                <asp:RadioButtonList ID="q1" runat="server">
+                    <asp:ListItem>Berlin</asp:ListItem>
+                    <asp:ListItem>Paris</asp:ListItem>
+                    <asp:ListItem>Rome</asp:ListItem>
+                    <asp:ListItem>Madrid</asp:ListItem>
+                </asp:RadioButtonList><br />
+
+                <asp:Label runat="server" Text="2. 5 + 3 = ?" /><br />
+                <asp:RadioButtonList ID="q2" runat="server">
+                    <asp:ListItem>7</asp:ListItem>
+                    <asp:ListItem>8</asp:ListItem>
+                    <asp:ListItem>9</asp:ListItem>
+                    <asp:ListItem>10</asp:ListItem>
+                </asp:RadioButtonList><br />
+
+                <asp:Label runat="server" Text="3. Which planet is known as the Red Planet?" /><br />
+                <asp:RadioButtonList ID="q3" runat="server">
+                    <asp:ListItem>Earth</asp:ListItem>
+                    <asp:ListItem>Venus</asp:ListItem>
+                    <asp:ListItem>Mars</asp:ListItem>
+                    <asp:ListItem>Jupiter</asp:ListItem>
+                </asp:RadioButtonList><br />
+
+                <asp:Label runat="server" Text="4. Which is a programming language?" /><br />
+                <asp:RadioButtonList ID="q4" runat="server">
+                    <asp:ListItem>HTML</asp:ListItem>
+                    <asp:ListItem>CSS</asp:ListItem>
+                    <asp:ListItem>Python</asp:ListItem>
+                    <asp:ListItem>Photoshop</asp:ListItem>
+                </asp:RadioButtonList><br />
+
+                <asp:Label runat="server" Text="5. Who wrote 'Hamlet'?" /><br />
+                <asp:RadioButtonList ID="q5" runat="server">
+                    <asp:ListItem>Shakespeare</asp:ListItem>
+                    <asp:ListItem>Dickens</asp:ListItem>
+                    <asp:ListItem>Rowling</asp:ListItem>
+                    <asp:ListItem>Twain</asp:ListItem>
+                </asp:RadioButtonList><br />
+
+                <asp:Button ID="btnSubmit" runat="server" Text="Submit Answers" OnClick="btnSubmit_Click" /><br /><br />
+
+            </asp:Panel>
+
+            <asp:Label ID="lblScore" runat="server" Font-Bold="true" /><br /><br />
+
+            <asp:GridView ID="gvResults" runat="server" AutoGenerateColumns="false">
+                <Columns>
+                    <asp:BoundField DataField="Name" HeaderText="Name" />
+                    <asp:BoundField DataField="Score" HeaderText="Score" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+
+public partial class Quiz : System.Web.UI.Page
+{
+    static List<(string Name, int Score)> results = new List<(string, int)>();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            gvResults.DataSource = GetResultTable();
+            gvResults.DataBind();
+        }
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        int score = 0;
+        string user = txtName.Text.Trim();
+
+        if (q1.SelectedIndex == 1) score++; // Paris
+        if (q2.SelectedIndex == 1) score++; // 8
+        if (q3.SelectedIndex == 2) score++; // Mars
+        if (q4.SelectedIndex == 2) score++; // Python
+        if (q5.SelectedIndex == 0) score++; // Shakespeare
+
+        // Save result
+        results.Insert(0, (user, score));
+        if (results.Count > 5)
+            results.RemoveAt(5);
+
+        // Show score
+        lblScore.Text = $"Your Score: {score}/5";
+
+        // Update grid
+        gvResults.DataSource = GetResultTable();
+        gvResults.DataBind();
+
+        // Optionally, hide quiz panel
+        pnlQuiz.Visible = false;
+    }
+
+    private DataTable GetResultTable()
+    {
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Name");
+        dt.Columns.Add("Score");
+
+        foreach (var r in results)
+        {
+            DataRow dr = dt.NewRow();
+            dr["Name"] = r.Name;
+            dr["Score"] = r.Score.ToString();
+            dt.Rows.Add(dr);
+        }
+
+        return dt;
+    }
+}
+

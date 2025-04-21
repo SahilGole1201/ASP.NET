@@ -1,0 +1,230 @@
+Slip 1
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="statemanagement.aspx.cs" Inherits="demo.statemanagement" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+        </div>
+        <asp:Label ID="lbl1" runat="server" Text="enter the text"></asp:Label>
+        <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+        <p>
+            <asp:Label ID="lbl2" runat="server" Text="enter "></asp:Label>
+        </p>
+        <asp:Button ID="btn1" runat="server" OnClick="btn1_Click" Text="save" />
+        <asp:Button ID="btn2" runat="server" OnClick="btn2_Click" Text="next" />
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace demo
+{
+    public partial class statemanagement : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btn1_Click(object sender, EventArgs e)
+        {
+            ViewState["UserName"] = TextBox1.Text;
+            lbl2.Text = ViewState["UserName"].ToString();
+        }
+
+        protected void btn2_Click(object sender, EventArgs e)
+        {
+            string pranav = TextBox1.Text;
+            Response.Redirect("web2.aspx?name=" + pranav);
+        }
+    }
+}
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="web2.aspx.cs" Inherits="demo.web2" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+        </div>
+        <asp:Label ID="lbl4" runat="server" Text="Label"></asp:Label>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace demo
+{
+    public partial class web2 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if(!IsPostBack)
+            {
+                string raj = Request.QueryString["name"];
+                lbl4.Text = "Received From String :" + raj;
+
+            }
+        }
+    }
+}
+
+
+
+
+
+Q2.
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Quiz.aspx.cs" Inherits="Quiz" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Quiz - SPPU M.Sc. CS 2023-24</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h2>SPPU M.Sc. CS Quiz 2023-24</h2>
+            <asp:Repeater ID="rptQuiz" runat="server">
+                <ItemTemplate>
+                    <div style="margin-bottom: 20px;">
+                        <strong>Q<%# Container.ItemIndex + 1 %>: <%# Eval("Question") %></strong><br />
+                        <asp:RadioButtonList ID="rblOptions" runat="server" RepeatDirection="Vertical">
+                            <asp:ListItem Text='<%# Eval("Option1") %>' Value="1" />
+                            <asp:ListItem Text='<%# Eval("Option2") %>' Value="2" />
+                            <asp:ListItem Text='<%# Eval("Option3") %>' Value="3" />
+                            <asp:ListItem Text='<%# Eval("Option4") %>' Value="4" />
+                        </asp:RadioButtonList>
+                    </div>
+                </ItemTemplate>
+            </asp:Repeater>
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit Quiz" OnClick="btnSubmit_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Web.UI.WebControls;
+
+public partial class Quiz : System.Web.UI.Page
+{
+    public class QuizQuestion
+    {
+        public string Question { get; set; }
+        public string Option1 { get; set; }
+        public string Option2 { get; set; }
+        public string Option3 { get; set; }
+        public string Option4 { get; set; }
+        public int CorrectOption { get; set; }
+    }
+
+    protected List<QuizQuestion> Questions
+    {
+        get { return (List<QuizQuestion>)ViewState["Questions"]; }
+        set { ViewState["Questions"] = value; }
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            Questions = new List<QuizQuestion>
+            {
+                new QuizQuestion { Question = "What is the output of 2+2 in C#?", Option1 = "22", Option2 = "4", Option3 = "Error", Option4 = "None", CorrectOption = 2 },
+                new QuizQuestion { Question = "Which one is a value type?", Option1 = "Class", Option2 = "Interface", Option3 = "Struct", Option4 = "Delegate", CorrectOption = 3 },
+                new QuizQuestion { Question = "What is ASP.NET?", Option1 = "Operating System", Option2 = "Web Framework", Option3 = "Language", Option4 = "None", CorrectOption = 2 },
+                new QuizQuestion { Question = "Which method is used to start a thread?", Option1 = "Run()", Option2 = "Start()", Option3 = "Init()", Option4 = "Begin()", CorrectOption = 2 },
+                new QuizQuestion { Question = "Which SQL clause is used for filtering?", Option1 = "WHERE", Option2 = "ORDER BY", Option3 = "GROUP BY", Option4 = "HAVING", CorrectOption = 1 }
+            };
+
+            rptQuiz.DataSource = Questions;
+            rptQuiz.DataBind();
+        }
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        int correctCount = 0;
+        for (int i = 0; i < rptQuiz.Items.Count; i++)
+        {
+            RadioButtonList rbl = (RadioButtonList)rptQuiz.Items[i].FindControl("rblOptions");
+            if (rbl != null && rbl.SelectedValue != "")
+            {
+                int selected = int.Parse(rbl.SelectedValue);
+                if (selected == Questions[i].CorrectOption)
+                {
+                    correctCount++;
+                }
+            }
+        }
+
+        Response.Redirect("Result.aspx?score=" + correctCount);
+    }
+}
+
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Result.aspx.cs" Inherits="Result" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Quiz Result</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h2>Your Quiz Result</h2>
+            <asp:Label ID="lblScore" runat="server" Font-Size="Large"></asp:Label>
+        </div>
+    </form>
+</body>
+</html>
+  
+
+
+using System;
+
+public partial class Result : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        string score = Request.QueryString["score"];
+        lblScore.Text = "You answered " + score + " out of 5 questions correctly!";
+    }
+}
+

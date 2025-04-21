@@ -1,0 +1,154 @@
+slip 23
+Q1
+
+Q1
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="SessionDemo1.aspx.cs" Inherits="SessionDemo1" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Session State Demo - Page 1</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Enter Your Information</h2>
+
+            Name:
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+            Age:
+            <asp:TextBox ID="txtAge" runat="server" /><br /><br />
+            
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class SessionDemo1 : System.Web.UI.Page
+{
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        // Store values in session state
+        Session["Name"] = txtName.Text;
+        Session["Age"] = txtAge.Text;
+
+        // Redirect to another page
+        Response.Redirect("SessionDemo2.aspx");
+    }
+}
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="SessionDemo2.aspx.cs" Inherits="SessionDemo2" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Session State Demo - Page 2</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Welcome Back!</h2>
+
+            <asp:Label ID="lblInfo" runat="server" Font-Bold="true" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class SessionDemo2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        // Retrieve session values
+        string name = Session["Name"] as string;
+        string age = Session["Age"] as string;
+
+        lblInfo.Text = $"Hello {name}, your age is {age}.";
+    }
+}
+
+Q2
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Registration.aspx.cs" Inherits="Registration" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Student Registration Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px; max-width: 400px; font-family: Arial;">
+
+            <h2>Registration Form</h2>
+
+            <!-- Name -->
+            Name:<br />
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+
+            <!-- Email -->
+            Email:<br />
+            <asp:TextBox ID="txtEmail" runat="server" /><br /><br />
+
+            <!-- Gender -->
+            Gender:<br />
+            <asp:RadioButtonList ID="rblGender" runat="server" RepeatDirection="Horizontal">
+                <asp:ListItem Text="Male" Value="Male" />
+                <asp:ListItem Text="Female" Value="Female" />
+            </asp:RadioButtonList><br />
+
+            <!-- Country -->
+            Country:<br />
+            <asp:DropDownList ID="ddlCountry" runat="server">
+                <asp:ListItem Text="--Select--" Value="" />
+                <asp:ListItem Text="USA" />
+                <asp:ListItem Text="India" />
+                <asp:ListItem Text="Canada" />
+                <asp:ListItem Text="UK" />
+            </asp:DropDownList><br /><br />
+
+            <!-- Password -->
+            Password:<br />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" /><br /><br />
+
+            <!-- Submit Button -->
+            <asp:Button ID="btnRegister" runat="server" Text="Register" OnClick="btnRegister_Click" /><br /><br />
+
+            <!-- Result Label -->
+            <asp:Label ID="lblMessage" runat="server" Font-Bold="true" ForeColor="Green" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class Registration : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+    }
+
+    protected void btnRegister_Click(object sender, EventArgs e)
+    {
+        string name = txtName.Text;
+        string email = txtEmail.Text;
+        string gender = rblGender.SelectedValue;
+        string country = ddlCountry.SelectedValue;
+        string password = txtPassword.Text;
+
+        // You could store this into a database here
+        lblMessage.Text = $"Registered Successfully!<br />Welcome, {name} from {country}.";
+    }
+}
+

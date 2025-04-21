@@ -1,0 +1,161 @@
+slip 24
+
+Q1
+
+<<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="calender.aspx.cs" Inherits="WebApplication9.calender" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+       <div style="padding: 20px; font-family: Arial;">
+            <h2>File Upload and Date Picker</h2>
+
+            <!-- File Upload -->
+            <asp:Label ID="lblUpload" runat="server" Text="Upload a file:" /><br />
+            <asp:FileUpload ID="FileUpload1" runat="server" /><br /><br />
+
+            <!-- Calendar -->
+            <asp:Label ID="lblDate" runat="server" Text="Select a date:" /><br />
+            <asp:Calendar ID="Calendar1" runat="server" /><br /><br />
+
+            <!-- Submit Button -->
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" /><br /><br />
+
+            <!-- Output Label -->
+            <asp:Label ID="lblResult" runat="server" Font-Bold="true" ForeColor="Green" />
+        </div>
+
+    </form>
+</body>
+</html>
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace WebApplication9
+{
+    public partial class calender : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            string fileMessage = "";
+            string dateMessage = "Selected Date: " + Calendar1.SelectedDate.ToShortDateString();
+
+            // Handle file upload
+            if (FileUpload1.HasFile)
+            {
+                string folderPath = Server.MapPath("~/Uploads/");
+
+                // Create folder if it doesn't exist
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                string fileName = Path.GetFileName(FileUpload1.FileName);
+                string fullPath = folderPath + fileName;
+                FileUpload1.SaveAs(fullPath);
+
+                fileMessage = $"File '{fileName}' uploaded successfully.";
+            }
+            else
+            {
+                fileMessage = "No file selected.";
+            }
+
+            lblResult.Text = fileMessage + "<br />" + dateMessage;
+        }
+    }
+}
+
+
+
+Q2
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Registration.aspx.cs" Inherits="Registration" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Student Registration Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px; max-width: 400px; font-family: Arial;">
+
+            <h2>Registration Form</h2>
+
+            <!-- Name -->
+            Name:<br />
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+
+            <!-- Email -->
+            Email:<br />
+            <asp:TextBox ID="txtEmail" runat="server" /><br /><br />
+
+            <!-- Gender -->
+            Gender:<br />
+            <asp:RadioButtonList ID="rblGender" runat="server" RepeatDirection="Horizontal">
+                <asp:ListItem Text="Male" Value="Male" />
+                <asp:ListItem Text="Female" Value="Female" />
+            </asp:RadioButtonList><br />
+
+            <!-- Country -->
+            Country:<br />
+            <asp:DropDownList ID="ddlCountry" runat="server">
+                <asp:ListItem Text="--Select--" Value="" />
+                <asp:ListItem Text="USA" />
+                <asp:ListItem Text="India" />
+                <asp:ListItem Text="Canada" />
+                <asp:ListItem Text="UK" />
+            </asp:DropDownList><br /><br />
+
+            <!-- Password -->
+            Password:<br />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" /><br /><br />
+
+            <!-- Submit Button -->
+            <asp:Button ID="btnRegister" runat="server" Text="Register" OnClick="btnRegister_Click" /><br /><br />
+
+            <!-- Result Label -->
+            <asp:Label ID="lblMessage" runat="server" Font-Bold="true" ForeColor="Green" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class Registration : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+    }
+
+    protected void btnRegister_Click(object sender, EventArgs e)
+    {
+        string name = txtName.Text;
+        string email = txtEmail.Text;
+        string gender = rblGender.SelectedValue;
+        string country = ddlCountry.SelectedValue;
+        string password = txtPassword.Text;
+
+        // You could store this into a database here
+        lblMessage.Text = $"Registered Successfully!<br />Welcome, {name} from {country}.";
+    }
+}
+

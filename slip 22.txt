@@ -1,0 +1,168 @@
+slip 22
+
+Q1
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="SessionDemo1.aspx.cs" Inherits="SessionDemo1" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Session State Demo - Page 1</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Enter Your Information</h2>
+
+            Name:
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+            Age:
+            <asp:TextBox ID="txtAge" runat="server" /><br /><br />
+            
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class SessionDemo1 : System.Web.UI.Page
+{
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        // Store values in session state
+        Session["Name"] = txtName.Text;
+        Session["Age"] = txtAge.Text;
+
+        // Redirect to another page
+        Response.Redirect("SessionDemo2.aspx");
+    }
+}
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="SessionDemo2.aspx.cs" Inherits="SessionDemo2" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Session State Demo - Page 2</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Welcome Back!</h2>
+
+            <asp:Label ID="lblInfo" runat="server" Font-Bold="true" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class SessionDemo2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        // Retrieve session values
+        string name = Session["Name"] as string;
+        string age = Session["Age"] as string;
+
+        lblInfo.Text = $"Hello {name}, your age is {age}.";
+    }
+}
+
+Q2
+%@ Page Language="C#" AutoEventWireup="true" CodeFile="UserRegistration.aspx.cs" Inherits="UserRegistration" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>User Registration Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="width: 500px; margin: auto;">
+            <h2>User Registration</h2>
+
+            <!-- User ID -->
+            <asp:Label Text="User ID:" runat="server" /><br />
+            <asp:TextBox ID="txtUserID" runat="server" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtUserID" ErrorMessage="* Required" ForeColor="Red" runat="server" />
+            <asp:RegularExpressionValidator
+                ControlToValidate="txtUserID"
+                ValidationExpression="^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{7,20}$"
+                ErrorMessage="* 1 uppercase, 1 digit, 7-20 chars"
+                ForeColor="Red"
+                runat="server" /><br /><br />
+
+            <!-- Name -->
+            <asp:Label Text="Name:" runat="server" /><br />
+            <asp:TextBox ID="txtName" runat="server" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtName" ErrorMessage="* Required" ForeColor="Red" runat="server" /><br /><br />
+
+            <!-- Password -->
+            <asp:Label Text="Password:" runat="server" /><br />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtPassword" ErrorMessage="* Required" ForeColor="Red" runat="server" /><br /><br />
+
+            <!-- Confirm Password -->
+            <asp:Label Text="Confirm Password:" runat="server" /><br />
+            <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtConfirmPassword" ErrorMessage="* Required" ForeColor="Red" runat="server" />
+            <asp:CompareValidator ControlToCompare="txtPassword" ControlToValidate="txtConfirmPassword" ErrorMessage="* Passwords do not match" ForeColor="Red" runat="server" /><br /><br />
+
+            <!-- Age -->
+            <asp:Label Text="Age (21-30):" runat="server" /><br />
+            <asp:TextBox ID="txtAge" runat="server" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtAge" ErrorMessage="* Required" ForeColor="Red" runat="server" />
+            <asp:RangeValidator ControlToValidate="txtAge" MinimumValue="21" MaximumValue="30" Type="Integer" ErrorMessage="* Age must be 21–30" ForeColor="Red" runat="server" /><br /><br />
+
+            <!-- Email -->
+            <asp:Label Text="Email ID:" runat="server" /><br />
+            <asp:TextBox ID="txtEmail" runat="server" /><br />
+            <asp:RequiredFieldValidator ControlToValidate="txtEmail" ErrorMessage="* Required" ForeColor="Red" runat="server" />
+            <asp:RegularExpressionValidator
+                ControlToValidate="txtEmail"
+                ValidationExpression="^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$"
+                ErrorMessage="* Invalid Email"
+                ForeColor="Red"
+                runat="server" /><br /><br />
+
+            <!-- Submit Button -->
+            <asp:Button ID="btnRegister" runat="server" Text="Register" OnClick="btnRegister_Click" /><br /><br />
+
+            <!-- Output Message -->
+            <asp:Label ID="lblMessage" runat="server" Font-Bold="true" ForeColor="Green" />
+
+            <!-- Validation Summary -->
+            <asp:ValidationSummary ID="ValidationSummary1" runat="server" ForeColor="Red" HeaderText="Please fix these errors:" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class UserRegistration : System.Web.UI.Page
+{
+    protected void btnRegister_Click(object sender, EventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            lblMessage.Text = $"Registration Successful!<br/>" +
+                              $"User ID: {txtUserID.Text}<br/>" +
+                              $"Name: {txtName.Text}<br/>" +
+                              $"Age: {txtAge.Text}<br/>" +
+                              $"Email: {txtEmail.Text}";
+        }
+        else
+        {
+            lblMessage.Text = "";
+        }
+    }
+}

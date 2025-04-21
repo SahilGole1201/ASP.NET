@@ -1,0 +1,168 @@
+slip 25
+
+Q1
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Employee.aspx.cs" Inherits="WebApplication7.Employee" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+          <div style="padding: 30px; font-family: Arial;">
+            <h2>Employee Selector</h2>
+
+            <!-- ListBox -->
+            <asp:ListBox ID="lstEmployees" runat="server" SelectionMode="Multiple" Height="150px" Width="200px">
+                <asp:ListItem>John Doe</asp:ListItem>
+                <asp:ListItem>Jane Smith</asp:ListItem>
+                <asp:ListItem>Robert Brown</asp:ListItem>
+                <asp:ListItem>Alice Johnson</asp:ListItem>
+                <asp:ListItem>Michael King</asp:ListItem>
+            </asp:ListBox><br /><br />
+
+            <!-- Buttons -->
+            <asp:Button ID="btnAddSelected" runat="server" Text="Add Selected" OnClick="btnAddSelected_Click" />
+            &nbsp;
+            <asp:Button ID="btnAddAll" runat="server" Text="Add All" OnClick="btnAddAll_Click" /><br /><br />
+
+            <!-- Multi-line TextBox -->
+            <asp:TextBox ID="txtResult" runat="server" TextMode="MultiLine" Rows="10" Columns="40" />
+        </div>
+    </form>
+    <p>
+        ;</p>
+</body>
+</html>
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace WebApplication7
+{
+    public partial class Employee : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+       
+        protected void btnAddSelected_Click(object sender, EventArgs e)
+        {
+            StringBuilder selectedEmployees = new StringBuilder();
+
+            foreach (var item in lstEmployees.Items)
+            {
+                var listItem = item as System.Web.UI.WebControls.ListItem;
+                if (listItem != null && listItem.Selected)
+                {
+                    selectedEmployees.AppendLine(listItem.Text);
+                }
+            }
+
+            txtResult.Text = selectedEmployees.ToString();
+        }
+        protected void btnAddAll_Click(object sender, EventArgs e)
+        {
+            StringBuilder allEmployees = new StringBuilder();
+            foreach (System.Web.UI.WebControls.ListItem item in lstEmployees.Items)
+            {
+                if (item.Selected)
+                {
+                    allEmployees.AppendLine(item.Text);
+                }
+            }
+
+
+            txtResult.Text = allEmployees.ToString();
+        }
+
+
+    }
+}
+
+
+Q2<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="calculator.aspx.cs" Inherits="WebApplication8.calculator" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px; font-family: Arial; max-width: 400px;">
+            <h3>How is the book "ASP.NET with C# by Vipul Prakashan"?</h3>
+
+            <asp:RadioButtonList ID="rblVote" runat="server">
+                <asp:ListItem Text="Good" Value="Good" />
+                <asp:ListItem Text="Satisfactory" Value="Satisfactory" />
+                <asp:ListItem Text="Bad" Value="Bad" />
+            </asp:RadioButtonList>
+
+            <asp:Button ID="btnVote" runat="server" Text="VOTE" OnClick="btnVote_Click" /><br /><br />
+
+            <b>Results:</b><br />
+            Good: <asp:Label ID="lblGood" runat="server" Text="0%" /><br />
+            Satisfactory: <asp:Label ID="lblSatisfactory" runat="server" Text="0%" /><br />
+            Bad: <asp:Label ID="lblBad" runat="server" Text="0%" /><br />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace WebApplication8
+{
+    public partial class calculator : System.Web.UI.Page
+    {
+        static int goodCount = 0, satisfactoryCount = 0, badCount = 0;
+
+        protected void btnVote_Click(object sender, EventArgs e)
+        {
+            string vote = rblVote.SelectedValue;
+
+            // Count votes
+            switch (vote)
+            {
+                case "Good":
+                    goodCount++;
+                    break;
+                case "Satisfactory":
+                    satisfactoryCount++;
+                    break;
+                case "Bad":
+                    badCount++;
+                    break;
+            }
+
+            // Calculate total and percentages
+            int total = goodCount + satisfactoryCount + badCount;
+            if (total > 0)
+            {
+                lblGood.Text = ((goodCount * 100) / total).ToString() + "%";
+                lblSatisfactory.Text = ((satisfactoryCount * 100) / total).ToString() + "%";
+                lblBad.Text = ((badCount * 100) / total).ToString() + "%";
+            }
+        }
+    }
+}

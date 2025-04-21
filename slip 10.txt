@@ -1,0 +1,341 @@
+slip 10
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="MessageFormatter.aspx.cs" Inherits="MessageFormatter" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Message Formatter</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="margin: 40px auto; width: 500px; font-family: Arial;">
+            <h2>Message Formatter</h2>
+
+            <asp:Label Text="Enter Your Name:" runat="server" /><br />
+            <asp:TextBox ID="txtName" runat="server" Width="300px" /><br /><br />
+
+            <asp:Label Text="Enter Your Message:" runat="server" /><br />
+            <asp:TextBox ID="txtMessage" runat="server" Width="300px" /><br /><br />
+
+            <asp:Label Text="Text Style:" runat="server" /><br />
+            <asp:CheckBox ID="chkBold" Text="Bold" runat="server" />
+            <asp:CheckBox ID="chkItalic" Text="Italic" runat="server" />
+            <asp:CheckBox ID="chkUnderline" Text="Underline" runat="server" /><br /><br />
+
+            <asp:Label Text="Text Color:" runat="server" /><br />
+            <asp:RadioButton ID="rbRed" GroupName="color" Text="Red" runat="server" />
+            <asp:RadioButton ID="rbGreen" GroupName="color" Text="Green" runat="server" />
+            <asp:RadioButton ID="rbBlue" GroupName="color" Text="Blue" runat="server" /><br /><br />
+
+            <asp:Button ID="btnDisplay" Text="Display Message" runat="server" OnClick="btnDisplay_Click" />
+            <asp:Button ID="btnClear" Text="Clear" runat="server" OnClick="btnClear_Click" />
+            <asp:Button ID="btnExit" Text="Exit" runat="server" OnClientClick="window.close(); return false;" /><br /><br />
+
+            <asp:Label ID="lblResult" runat="server" Font-Size="Large" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Drawing;
+
+public partial class MessageFormatter : System.Web.UI.Page
+{
+    protected void btnDisplay_Click(object sender, EventArgs e)
+    {
+        string name = txtName.Text.Trim();
+        string message = txtMessage.Text.Trim();
+
+        lblResult.Text = $"{name}: {message}";
+
+        // Apply styles
+        lblResult.Font.Bold = chkBold.Checked;
+        lblResult.Font.Italic = chkItalic.Checked;
+        lblResult.Font.Underline = chkUnderline.Checked;
+
+        // Apply color
+        if (rbRed.Checked)
+            lblResult.ForeColor = Color.Red;
+        else if (rbGreen.Checked)
+            lblResult.ForeColor = Color.Green;
+        else if (rbBlue.Checked)
+            lblResult.ForeColor = Color.Blue;
+        else
+            lblResult.ForeColor = Color.Black;
+    }
+
+    protected void btnClear_Click(object sender, EventArgs e)
+    {
+        txtName.Text = "";
+        txtMessage.Text = "";
+        lblResult.Text = "";
+
+        chkBold.Checked = false;
+        chkItalic.Checked = false;
+        chkUnderline.Checked = false;
+
+        rbRed.Checked = false;
+        rbGreen.Checked = false;
+        rbBlue.Checked = false;
+    }
+}
+
+
+Q2.
+
+
+
+CREATE TABLE Teachers (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100),
+    Subject NVARCHAR(100),
+    Qualification NVARCHAR(100),
+    Experience INT,
+    Email NVARCHAR(100)
+);
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="TeacherEntry.aspx.cs" Inherits="TeacherEntry" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Teacher Entry</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="width: 600px; margin: 30px auto;">
+            <h2>Enter Teacher Details</h2>
+
+            <asp:Label Text="Name:" runat="server" />
+            <asp:TextBox ID="txtName" runat="server" Width="300px" /><br /><br />
+
+            <asp:Label Text="Subject:" runat="server" />
+            <asp:TextBox ID="txtSubject" runat="server" Width="300px" /><br /><br />
+
+            <asp:Label Text="Qualification:" runat="server" />
+            <asp:TextBox ID="txtQualification" runat="server" Width="300px" /><br /><br />
+
+            <asp:Label Text="Experience (years):" runat="server" />
+            <asp:TextBox ID="txtExperience" runat="server" Width="100px" /><br /><br />
+
+            <asp:Label Text="Email:" runat="server" />
+            <asp:TextBox ID="txtEmail" runat="server" Width="300px" /><br /><br />
+
+            <asp:Button ID="btnSubmit" Text="Add Teacher" runat="server" OnClick="btnSubmit_Click" /><br /><br />
+
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="true" Width="100%" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+
+public partial class TeacherEntry : System.Web.UI.Page
+{
+    // Replace with your actual connection string
+    string connStr = "Data Source=YOUR_SERVER;Initial Catalog=YOUR_DATABASE;Integrated Security=True";
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            LoadTeachers();
+        }
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        using (SqlConnection conn = new SqlConnection(connStr))
+        {
+            string query = "INSERT INTO Teachers (Name, Subject, Qualification, Experience, Email) " +
+                           "VALUES (@Name, @Subject, @Qualification, @Experience, @Email)";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@Name", txtName.Text);
+            cmd.Parameters.AddWithValue("@Subject", txtSubject.Text);
+            cmd.Parameters.AddWithValue("@Qualification", txtQualification.Text);
+            cmd.Parameters.AddWithValue("@Experience", Convert.ToInt32(txtExperience.Text));
+            cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        // Clear form and reload grid
+        txtName.Text = "";
+        txtSubject.Text = "";
+        txtQualification.Text = "";
+        txtExperience.Text = "";
+        txtEmail.Text = "";
+
+        LoadTeachers();
+    }
+
+    private void LoadTeachers()
+    {
+        using (SqlConnection conn = new SqlConnection(connStr))
+        {
+            string query = "SELECT * FROM Teachers";
+            SqlDataAdapter da = new SqlDataAdapter(query, conn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+}
+
+
+
+Q2
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="database_pratice.WebForm1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            EMP id :-<asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Name:-<asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Desgination:-<asp:TextBox ID="TextBox3" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Joining Date:-<asp:TextBox ID="TextBox4" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Mobile Number:-<asp:TextBox ID="TextBox5" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            Gender:-<asp:TextBox ID="TextBox6" runat="server"></asp:TextBox>
+            <br />
+            <br />
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="id" DataSourceID="SqlDataSource1">
+                <Columns>
+                    <asp:BoundField DataField="id" HeaderText="id" ReadOnly="True" SortExpression="id" />
+                    <asp:BoundField DataField="name" HeaderText="name" SortExpression="name" />
+                    <asp:BoundField DataField="desg" HeaderText="desg" SortExpression="desg" />
+                    <asp:BoundField DataField="joindate" HeaderText="joindate" SortExpression="joindate" />
+                    <asp:BoundField DataField="mobile" HeaderText="mobile" SortExpression="mobile" />
+                    <asp:BoundField DataField="gender" HeaderText="gender" SortExpression="gender" />
+                </Columns>
+            </asp:GridView>
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:ConnectionString %>" SelectCommand="SELECT * FROM [employer]"></asp:SqlDataSource>
+            <br />
+            <asp:Button ID="Button1" runat="server"  OnClick="Button1_Click" Text="Insert" />
+&nbsp;&nbsp;
+            <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="Delete" />
+&nbsp;&nbsp;
+            <asp:Button ID="Button3" runat="server" OnClick="Button3_Click" Text="Edit" />
+            <br />
+            <br />
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace database_pratice
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        SqlConnection cn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Database1.mdf;Integrated Security=True;Connect Timeout=30");
+        DataSet ds = new DataSet();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            SqlDataAdapter da = new SqlDataAdapter("select * from employer", cn);
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query1 = "INSERT INTO employer VALUES('"+TextBox1.Text+ "','" + TextBox2.Text + "','" + TextBox3.Text + "','" + TextBox4.Text + "','" + TextBox5.Text + "','" + TextBox6.Text + "')";
+            SqlCommand cmd = new SqlCommand(query1, cn);
+            cmd.ExecuteNonQuery();
+            GridView1.DataBind();
+            cn.Close();
+            TextBox1.Text = "";
+            TextBox2.Text = "";
+            TextBox3.Text = "";
+            TextBox4.Text = "";
+            TextBox5.Text = "";
+            TextBox6.Text = "";
+            Response.Write("<script>alert('Inserted Successfully');</script>");
+
+        }
+
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query2 = "delete from employer where id= " + TextBox1.Text;
+            SqlCommand cmd = new SqlCommand(query2, cn);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                GridView1.DataBind();
+                TextBox1.Text = "";
+                TextBox2.Text = "";
+                TextBox3.Text = "";
+                TextBox4.Text = "";
+                TextBox5.Text = "";
+                TextBox6.Text = "";
+                Response.Write("<script>alert('Deleted Successfully');</script>");
+            }catch(Exception x)
+            {
+                Response.Write("<script>alert('Not deleted ');</script>" + x);
+            }finally
+            {
+                cn.Close();
+            }
+        }
+
+        protected void Button3_Click(object sender, EventArgs e)
+        {
+            cn.Open();
+            string query3 = "update employer set name='" + TextBox2.Text + "',desg= '" + TextBox3.Text + "',joindate='" + TextBox4.Text + "',mobile= '" + TextBox5.Text + "',gender= '" + TextBox6.Text + "' where id= " + TextBox1.Text;
+            SqlCommand cmd = new SqlCommand(query3, cn);
+            cmd.ExecuteNonQuery();
+            GridView1.DataBind();
+            Response.Write("<script>alert('Updated Successfully');</script>");
+        }
+    }
+}
+
+
+
+CREATE TABLE [dbo].[employer] (
+    [id]       INT        NOT NULL,
+    [name]     NCHAR (10) NULL,
+    [desg]     NCHAR (10) NULL,
+    [joindate] NCHAR (10) NULL,
+    [mobile]   INT        NULL,
+    [gender]   NCHAR (10) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);

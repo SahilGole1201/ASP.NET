@@ -1,0 +1,149 @@
+slip 13
+
+Q1
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="NameValidation.aspx.cs" Inherits="NameValidation" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Name Validation Example</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="margin: 50px;">
+            <asp:Label ID="lblName" runat="server" Text="Enter your name: "></asp:Label>
+            <asp:TextBox ID="txtName" runat="server"></asp:TextBox>
+            <asp:RequiredFieldValidator 
+                ID="rfvName" 
+                runat="server" 
+                ControlToValidate="txtName" 
+                ErrorMessage="Name is required." 
+                ForeColor="Red" 
+                Display="Dynamic">
+            </asp:RequiredFieldValidator>
+            <br /><br />
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+            <br /><br />
+            <asp:Label ID="lblResult" runat="server" ForeColor="Green"></asp:Label>
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class NameValidation : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            lblResult.Text = $"Hello, {txtName.Text}!";
+        }
+    }
+}
+
+
+
+
+Q2
+
+
+CREATE TABLE Employees (
+    EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100),
+    Email NVARCHAR(100),
+    Position NVARCHAR(100)
+);
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="EmployeeForm.aspx.cs" Inherits="EmployeeForm" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Employee Entry Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 20px;">
+            <h2>Enter Employee Information</h2>
+
+            <asp:Label runat="server" Text="Name: " />
+            <asp:TextBox ID="txtName" runat="server" /><br />
+
+            <asp:Label runat="server" Text="Email: " />
+            <asp:TextBox ID="txtEmail" runat="server" /><br />
+
+            <asp:Label runat="server" Text="Position: " />
+            <asp:TextBox ID="txtPosition" runat="server" /><br /><br />
+
+            <asp:Button ID="btnAdd" runat="server" Text="Add Employee" OnClick="btnAdd_Click" /><br /><br />
+
+            <asp:GridView ID="gvEmployees" runat="server" AutoGenerateColumns="true" />
+
+            <asp:Label ID="lblStatus" runat="server" ForeColor="Green" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public partial class EmployeeForm : System.Web.UI.Page
+{
+    string connStr = ConfigurationManager.ConnectionStrings["MyConnection"].ConnectionString;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            LoadEmployees();
+        }
+    }
+
+    protected void btnAdd_Click(object sender, EventArgs e)
+    {
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            string query = "INSERT INTO Employees (Name, Email, Position) VALUES (@Name, @Email, @Position)";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Name", txtName.Text);
+            cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
+            cmd.Parameters.AddWithValue("@Position", txtPosition.Text);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+
+        lblStatus.Text = "Employee added successfully.";
+        txtName.Text = txtEmail.Text = txtPosition.Text = "";
+        LoadEmployees();
+    }
+
+    private void LoadEmployees()
+    {
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            SqlDataAdapter da = new SqlDataAdapter("SELECT TOP 5 * FROM Employees ORDER BY EmployeeID DESC", con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            gvEmployees.DataSource = dt;
+            gvEmployees.DataBind();
+        }
+    }
+}
+
+

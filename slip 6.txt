@@ -1,0 +1,186 @@
+slip 6
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="EmployeeSelector.aspx.cs" Inherits="EmployeeSelector" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Employee Selector</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="width: 600px; margin: auto; padding-top: 30px;">
+            <h2>Select Employee(s)</h2>
+
+            <asp:ListBox ID="lstEmployees" runat="server" SelectionMode="Multiple" Rows="8" Width="300px">
+            </asp:ListBox><br /><br />
+
+            <asp:Button ID="btnAddSelected" runat="server" Text="Add Selected" OnClick="btnAddSelected_Click" />
+            <asp:Button ID="btnAddAll" runat="server" Text="Add All" OnClick="btnAddAll_Click" />
+            <asp:Button ID="btnClear" runat="server" Text="Clear" OnClick="btnClear_Click" />
+            <br /><br />
+
+            <asp:TextBox ID="txtOutput" runat="server" TextMode="MultiLine" Rows="8" Width="300px" ReadOnly="true" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class EmployeeSelector : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            // Sample employee names
+            lstEmployees.Items.Add("John Doe");
+            lstEmployees.Items.Add("Jane Smith");
+            lstEmployees.Items.Add("Michael Johnson");
+            lstEmployees.Items.Add("Emily Davis");
+            lstEmployees.Items.Add("Robert Brown");
+            lstEmployees.Items.Add("Linda Wilson");
+        }
+    }
+
+    protected void btnAddSelected_Click(object sender, EventArgs e)
+    {
+        foreach (var item in lstEmployees.Items)
+        {
+            var listItem = (System.Web.UI.WebControls.ListItem)item;
+            if (listItem.Selected)
+            {
+                txtOutput.Text += listItem.Text + Environment.NewLine;
+            }
+        }
+    }
+
+    protected void btnAddAll_Click(object sender, EventArgs e)
+    {
+        foreach (var item in lstEmployees.Items)
+        {
+            var listItem = (System.Web.UI.WebControls.ListItem)item;
+            txtOutput.Text += listItem.Text + Environment.NewLine;
+        }
+    }
+
+    protected void btnClear_Click(object sender, EventArgs e)
+    {
+        txtOutput.Text = "";
+        lstEmployees.ClearSelection();
+    }
+}
+
+
+Q2
+
+CREATE TABLE Teachers (
+    EmpID INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    Subject NVARCHAR(100),
+    Mobile NVARCHAR(15),
+    Email NVARCHAR(100)
+);
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="TeacherEntry.aspx.cs" Inherits="TeacherEntry" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Teacher Entry Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="width: 600px; margin: auto;">
+            <h2>Teacher Information Form</h2>
+
+            <asp:Label Text="Employee ID:" runat="server" /><br />
+            <asp:TextBox ID="txtEmpID" runat="server" /><br /><br />
+
+            <asp:Label Text="Name:" runat="server" /><br />
+            <asp:TextBox ID="txtName" runat="server" /><br /><br />
+
+            <asp:Label Text="Subject:" runat="server" /><br />
+            <asp:TextBox ID="txtSubject" runat="server" /><br /><br />
+
+            <asp:Label Text="Mobile:" runat="server" /><br />
+            <asp:TextBox ID="txtMobile" runat="server" /><br /><br />
+
+            <asp:Label Text="Email:" runat="server" /><br />
+            <asp:TextBox ID="txtEmail" runat="server" /><br /><br />
+
+            <asp:Button ID="btnSubmit" runat="server" Text="Add Teacher" OnClick="btnSubmit_Click" />
+            <hr />
+
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="True" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+
+public partial class TeacherEntry : System.Web.UI.Page
+{
+    string conStr = "Data Source=.;Initial Catalog=YourDatabaseName;Integrated Security=True"; // change DB name
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            BindTeachers();
+        }
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        using (SqlConnection con = new SqlConnection(conStr))
+        {
+            string query = "INSERT INTO Teachers (EmpID, Name, Subject, Mobile, Email) VALUES (@EmpID, @Name, @Subject, @Mobile, @Email)";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            cmd.Parameters.AddWithValue("@EmpID", Convert.ToInt32(txtEmpID.Text));
+            cmd.Parameters.AddWithValue("@Name", txtName.Text.Trim());
+            cmd.Parameters.AddWithValue("@Subject", txtSubject.Text.Trim());
+            cmd.Parameters.AddWithValue("@Mobile", txtMobile.Text.Trim());
+            cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+
+        ClearForm();
+        BindTeachers();
+    }
+
+    private void BindTeachers()
+    {
+        using (SqlConnection con = new SqlConnection(conStr))
+        {
+            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Teachers", con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+
+    private void ClearForm()
+    {
+        txtEmpID.Text = "";
+        txtName.Text = "";
+        txtSubject.Text = "";
+        txtMobile.Text = "";
+        txtEmail.Text = "";
+    }
+}
+
+
+

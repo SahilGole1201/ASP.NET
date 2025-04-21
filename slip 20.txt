@@ -1,0 +1,75 @@
+slip 20
+
+
+
+Q1
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="WebApplication5.WebForm1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        
+        <div style="width:400px; margin:auto; padding-top:30px;">
+            <h2>Session Text Example</h2>
+
+            <asp:Label ID="lblEnter" runat="server" Text="Enter some text:" /><br />
+            <asp:TextBox ID="TextBox1" runat="server" Width="300px" /><br /><br />
+
+            <asp:Button ID="Button1" runat="server" Text="Save Text" OnClick="btnSave_Click" />
+            <asp:Button ID="btnShow" runat="server" Text="Show Last Session Text" OnClick="btnShow_Click" />
+            <br /><br />
+
+            <asp:Label ID="lblDisplay" runat="server" Font-Bold="true" ForeColor="Blue" />
+        </div>
+      
+
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace WebApplication5
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnSave_Click(object sender, EventArgs e)
+        {
+            
+            Session["SavedText"] = Button1.Text;
+            lblDisplay.Text = "Text saved to session.";
+        }
+
+        protected void btnShow_Click(object sender, EventArgs e)
+        {
+
+            if (Session["SavedText"] != null)
+            {
+                lblDisplay.Text = "Last session text: " + Session["SavedText"].ToString();
+            }
+            else
+            {
+                lblDisplay.Text = "No text stored in session.";
+            }
+        }
+ }  }
+
+

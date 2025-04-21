@@ -1,0 +1,233 @@
+slip 18
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="StudentRegistration.aspx.cs" Inherits="StudentRegistration" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Student Registration Form</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px; max-width: 400px;">
+            <h2>Student Registration</h2>
+
+            <!-- Name -->
+            <asp:Label ID="lblName" runat="server" Text="Name:" />
+            <asp:TextBox ID="txtName" runat="server" />
+            <asp:RequiredFieldValidator 
+                ID="rfvName" 
+                runat="server" 
+                ControlToValidate="txtName" 
+                ErrorMessage="* Name is required" 
+                ForeColor="Red" 
+                Display="Dynamic" /><br /><br />
+
+            <!-- Age -->
+            <asp:Label ID="lblAge" runat="server" Text="Age:" />
+            <asp:TextBox ID="txtAge" runat="server" />
+            <asp:RequiredFieldValidator 
+                ID="rfvAge" 
+                runat="server" 
+                ControlToValidate="txtAge" 
+                ErrorMessage="* Age is required" 
+                ForeColor="Red" 
+                Display="Dynamic" />
+            <asp:RangeValidator 
+                ID="rvAge" 
+                runat="server" 
+                ControlToValidate="txtAge" 
+                MinimumValue="18" 
+                MaximumValue="30" 
+                Type="Integer" 
+                ErrorMessage="* Age must be between 18 and 30" 
+                ForeColor="Red" 
+                Display="Dynamic" /><br /><br />
+
+            <!-- Email -->
+            <asp:Label ID="lblEmail" runat="server" Text="Email:" />
+            <asp:TextBox ID="txtEmail" runat="server" />
+            <asp:RequiredFieldValidator 
+                ID="rfvEmail" 
+                runat="server" 
+                ControlToValidate="txtEmail" 
+                ErrorMessage="* Email is required" 
+                ForeColor="Red" 
+                Display="Dynamic" />
+            <asp:RegularExpressionValidator 
+                ID="revEmail" 
+                runat="server" 
+                ControlToValidate="txtEmail" 
+                ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" 
+                ErrorMessage="* Invalid email format" 
+                ForeColor="Red" 
+                Display="Dynamic" /><br /><br />
+
+            <!-- Submit Button -->
+            <asp:Button ID="btnSubmit" runat="server" Text="Register" OnClick="btnSubmit_Click" /><br /><br />
+
+            <!-- Result -->
+            <asp:Label ID="lblResult" runat="server" ForeColor="Green" />
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+
+public partial class StudentRegistration : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            lblResult.Text = $"Student {txtName.Text} registered successfully!";
+        }
+    }
+}
+
+Q2
+
+Q2
+CREATE TABLE Products (
+    Product_ID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100),
+    Price DECIMAL(10,2),
+    Quantity INT
+);
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProductGrid.aspx.cs" Inherits="ProductGrid" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Product Grid</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="padding: 30px;">
+            <h2>Product Details</h2>
+
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False"
+                DataKeyNames="Product_ID" 
+                OnRowEditing="GridView1_RowEditing"
+                OnRowUpdating="GridView1_RowUpdating"
+                OnRowCancelingEdit="GridView1_RowCancelingEdit"
+                OnRowDeleting="GridView1_RowDeleting"
+                CssClass="grid">
+                <Columns>
+                    <asp:BoundField DataField="Product_ID" HeaderText="ID" ReadOnly="True" />
+                    <asp:BoundField DataField="Name" HeaderText="Product Name" />
+                    <asp:BoundField DataField="Price" HeaderText="Price" />
+                    <asp:BoundField DataField="Quantity" HeaderText="Quantity" />
+                    
+                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public partial class ProductGrid : System.Web.UI.Page
+{
+    string connStr = ConfigurationManager.ConnectionStrings["MyConn"].ConnectionString;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+            LoadData();
+    }
+
+    private void LoadData()
+    {
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Products", con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+
+    protected void GridView1_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
+    {
+        GridView1.EditIndex = e.NewEditIndex;
+        LoadData();
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        LoadData();
+    }
+
+    protected void GridView1_RowUpdating(object sender, System.Web.UI.WebControls.GridViewUpdateEventArgs e)
+    {
+        int productId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+        string name = ((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[1].Controls[0]).Text;
+        decimal price = Convert.ToDecimal(((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[2].Controls[0]).Text);
+        int quantity = Convert.ToInt32(((System.Web.UI.WebControls.TextBox)GridView1.Rows[e.RowIndex].Cells[3].Controls[0]).Text);
+
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            string query = "UPDATE Products SET Name=@Name, Price=@Price, Quantity=@Quantity WHERE Product_ID=@ID";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ID", productId);
+            cmd.Parameters.AddWithValue("@Name", name);
+            cmd.Parameters.AddWithValue("@Price", price);
+            cmd.Parameters.AddWithValue("@Quantity", quantity);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        GridView1.EditIndex = -1;
+        LoadData();
+    }
+
+    protected void GridView1_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+    {
+        int productId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+
+        using (SqlConnection con = new SqlConnection(connStr))
+        {
+            string query = "DELETE FROM Products WHERE Product_ID=@ID";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ID", productId);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        LoadData();
+    }
+}
+
+
+
+XML
+
+<configuration>
+  <connectionStrings>
+    <add name="MyConn" 
+         connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=YourDatabaseName;Integrated Security=True"
+         providerName="System.Data.SqlClient" />
+  </connectionStrings>
+</configuration>
+
+
+

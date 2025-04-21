@@ -1,0 +1,246 @@
+slip 5
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="MessageStyler.aspx.cs" Inherits="MessageStyler" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Styled Message App</title>
+    <style>
+        .container {
+            width: 600px;
+            margin: auto;
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="container">
+            <h2>Styled Message App</h2>
+
+            <asp:Label ID="lblName" runat="server" Text="Enter your name:"></asp:Label><br />
+            <asp:TextBox ID="txtName" runat="server"></asp:TextBox><br /><br />
+
+            <asp:Label ID="lblMsg" runat="server" Text="Enter your message:"></asp:Label><br />
+            <asp:TextBox ID="txtMessage" runat="server"></asp:TextBox><br /><br />
+
+            <strong>Text Style:</strong><br />
+            <asp:CheckBox ID="chkBold" runat="server" Text="Bold" />
+            <asp:CheckBox ID="chkItalic" runat="server" Text="Italic" />
+            <asp:CheckBox ID="chkUnderline" runat="server" Text="Underline" />
+            <br /><br />
+
+            <strong>Text Color:</strong><br />
+            <asp:RadioButtonList ID="rblColor" runat="server">
+                <asp:ListItem Text="Red" Value="Red"></asp:ListItem>
+                <asp:ListItem Text="Blue" Value="Blue"></asp:ListItem>
+                <asp:ListItem Text="Green" Value="Green"></asp:ListItem>
+                <asp:ListItem Text="Black" Value="Black" Selected="True"></asp:ListItem>
+            </asp:RadioButtonList>
+            <br />
+
+            <asp:Button ID="btnDisplay" runat="server" Text="Display Message" OnClick="btnDisplay_Click" />
+            <asp:Button ID="btnClear" runat="server" Text="Clear" OnClick="btnClear_Click" />
+            <asp:Button ID="btnExit" runat="server" Text="Exit" OnClick="btnExit_Click" />
+
+            <hr />
+            <asp:Label ID="lblResult" runat="server" Font-Size="Large"></asp:Label>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Drawing;
+
+public partial class MessageStyler : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+
+    protected void btnDisplay_Click(object sender, EventArgs e)
+    {
+        string name = txtName.Text.Trim();
+        string message = txtMessage.Text.Trim();
+        string fullMessage = $"Hello {name}, your message: {message}";
+
+        lblResult.Text = fullMessage;
+
+        // Apply font styles
+        lblResult.Font.Bold = chkBold.Checked;
+        lblResult.Font.Italic = chkItalic.Checked;
+        lblResult.Font.Underline = chkUnderline.Checked;
+
+        // Set text color
+        string selectedColor = rblColor.SelectedValue;
+        lblResult.ForeColor = Color.FromName(selectedColor);
+    }
+
+    protected void btnClear_Click(object sender, EventArgs e)
+    {
+        txtName.Text = "";
+        txtMessage.Text = "";
+        lblResult.Text = "";
+
+        chkBold.Checked = false;
+        chkItalic.Checked = false;
+        chkUnderline.Checked = false;
+
+        rblColor.ClearSelection();
+        rblColor.Items.FindByText("Black").Selected = true;
+    }
+
+    protected void btnExit_Click(object sender, EventArgs e)
+    {
+        Response.Write("<script>window.close();</script>");
+    }
+}
+
+
+Q2
+
+
+
+
+CREATE TABLE Employees (
+    EmpID INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    Designation NVARCHAR(100),
+    JoiningDate DATE,
+    MobileNo NVARCHAR(15),
+    Gender NVARCHAR(10)
+);
+
+
+INSERT INTO Employees VALUES 
+(1, 'John Doe', 'Manager', '2020-01-15', '9876543210', 'Male'),
+(2, 'Jane Smith', 'Developer', '2021-05-20', '9876543211', 'Female');
+
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="EmployeeGrid.aspx.cs" Inherits="EmployeeGrid" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Employee Details Grid</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div style="width: 800px; margin: auto;">
+            <h2>Employee Details</h2>
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" 
+                DataKeyNames="EmpID" 
+                OnRowEditing="GridView1_RowEditing" 
+                OnRowUpdating="GridView1_RowUpdating" 
+                OnRowCancelingEdit="GridView1_RowCancelingEdit"
+                OnRowDeleting="GridView1_RowDeleting"
+                HeaderStyle-BackColor="#3F51B5" HeaderStyle-ForeColor="White">
+                <Columns>
+                    <asp:BoundField DataField="EmpID" HeaderText="Employee ID" ReadOnly="true" />
+                    <asp:BoundField DataField="Name" HeaderText="Name" />
+                    <asp:BoundField DataField="Designation" HeaderText="Designation" />
+                    <asp:BoundField DataField="JoiningDate" HeaderText="Joining Date" DataFormatString="{0:yyyy-MM-dd}" />
+                    <asp:BoundField DataField="MobileNo" HeaderText="Mobile No" />
+                    <asp:BoundField DataField="Gender" HeaderText="Gender" />
+                    
+                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public partial class EmployeeGrid : System.Web.UI.Page
+{
+    string conStr = "Data Source=.;Initial Catalog=YourDatabaseName;Integrated Security=True"; // change DB name if needed
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            BindGrid();
+        }
+    }
+
+    private void BindGrid()
+    {
+        using (SqlConnection con = new SqlConnection(conStr))
+        {
+            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Employees", con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+
+    protected void GridView1_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
+    {
+        GridView1.EditIndex = e.NewEditIndex;
+        BindGrid();
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        BindGrid();
+    }
+
+    protected void GridView1_RowUpdating(object sender, System.Web.UI.WebControls.GridViewUpdateEventArgs e)
+    {
+        GridViewRow row = GridView1.Rows[e.RowIndex];
+        int empId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+        string name = ((System.Web.UI.WebControls.TextBox)(row.Cells[1].Controls[0])).Text;
+        string designation = ((System.Web.UI.WebControls.TextBox)(row.Cells[2].Controls[0])).Text;
+        string joiningDate = ((System.Web.UI.WebControls.TextBox)(row.Cells[3].Controls[0])).Text;
+        string mobileNo = ((System.Web.UI.WebControls.TextBox)(row.Cells[4].Controls[0])).Text;
+        string gender = ((System.Web.UI.WebControls.TextBox)(row.Cells[5].Controls[0])).Text;
+
+        using (SqlConnection con = new SqlConnection(conStr))
+        {
+            string query = "UPDATE Employees SET Name=@Name, Designation=@Designation, JoiningDate=@JoiningDate, MobileNo=@MobileNo, Gender=@Gender WHERE EmpID=@EmpID";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@EmpID", empId);
+            cmd.Parameters.AddWithValue("@Name", name);
+            cmd.Parameters.AddWithValue("@Designation", designation);
+            cmd.Parameters.AddWithValue("@JoiningDate", joiningDate);
+            cmd.Parameters.AddWithValue("@MobileNo", mobileNo);
+            cmd.Parameters.AddWithValue("@Gender", gender);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        GridView1.EditIndex = -1;
+        BindGrid();
+    }
+
+    protected void GridView1_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+    {
+        int empId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value);
+
+        using (SqlConnection con = new SqlConnection(conStr))
+        {
+            SqlCommand cmd = new SqlCommand("DELETE FROM Employees WHERE EmpID=@EmpID", con);
+            cmd.Parameters.AddWithValue("@EmpID", empId);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        BindGrid();
+    }
+}
+
+
