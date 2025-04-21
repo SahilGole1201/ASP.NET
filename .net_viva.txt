@@ -1,0 +1,64 @@
+🧾 Slip 1, 9, 15, 21 – ViewState, QueryString (State Management)
+Q: What is ViewState in ASP.NET?
+A: ViewState maintains the state of controls between postbacks in the same page using hidden fields.
+
+Q: What is QueryString?
+A: QueryString passes values in the URL, typically used to send data from one page to another.
+
+Q: Which is more secure: ViewState or QueryString?
+A: ViewState is more secure since the data is not visible in the URL.
+
+🧾 Slip 2, 5, 8, 11, 17, 21 – GridView Operations (Edit/Delete)
+Q: What is GridView in ASP.NET?
+A: GridView displays data in a tabular format with built-in support for edit, delete, and paging.
+
+Q: How can you edit data in GridView?
+A: Set AutoGenerateEditButton="true" and handle RowEditing, RowUpdating, and RowCancelingEdit events.
+
+Q: What is the difference between GridView and DataList?
+A: GridView is used for tabular data, DataList gives more control over layout.
+
+🧾 Slip 3, 6, 12, 16 – Insert and Display from Database
+Q: How do you insert data into a database in ASP.NET?
+A: Using SQL commands with SqlCommand and ExecuteNonQuery() after establishing a connection.
+
+Q: How do you display database data in GridView?
+A: Bind GridView to a DataTable using a SqlDataAdapter.
+
+🧾 Slip 4, 7, 13, 14, 18 – Validation Controls
+Q: What are validation controls in ASP.NET?
+A: Special controls like RequiredFieldValidator, CompareValidator, RangeValidator used to validate user input.
+
+Q: What does CompareValidator do?
+A: Compares the values of two controls or a control value with a constant.
+
+Q: Can you combine multiple validators?
+A: Yes, multiple validators can be applied to a single control.
+
+🧾 Slip 10, 5, 20 – Formatting with Radio Buttons/Checkboxes
+Q: How do you apply styles dynamically to controls?
+A: Use properties like Font.Bold, Font.Italic, ForeColor in event handlers (e.g., button click).
+
+Q: How can a CheckBox be used to change formatting?
+A: Check the state of CheckBox and apply style using C# code.
+
+🧾 Slip 19, 22, 23 – Session State and Forms
+Q: What is Session State in ASP.NET?
+A: Session State stores user data on the server for the duration of the user session.
+
+Q: How is Session different from ViewState?
+A: Session stores data on the server across multiple pages; ViewState stores data on the client for the same page.
+
+🧾 Slip 24 – File Upload & Calendar Control
+Q: How do you upload a file in ASP.NET?
+A: Use FileUpload control and call SaveAs() to save the file.
+
+Q: What is the use of the Calendar control?
+A: Allows users to select dates; useful in forms like booking or scheduling.
+
+🧾 Slip 25 – ListBox and Voting App
+Q: How do you get multiple selected items from a ListBox?
+A: Loop through ListBox.Items and check Selected property.
+
+Q: How can you calculate percentage in a voting app?
+A: Use simple math: (votes for choice / total votes) * 100.
